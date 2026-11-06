@@ -1,0 +1,140 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Business {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  phone     String?
+  email     String?
+  address   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  services     Service[]
+  employees    Employee[]
+  appointments Appointment[]
+}
+
+model Service {
+  id              String   @id @default(uuid())
+  name            String
+  description     String?
+  durationMinutes Int
+  priceCents      Int
+  depositCents    Int?
+  active          Boolean  @default(true)
+
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  appointments Appointment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([businessId])
+}
+
+model Employee {
+  id     String  @id @default(uuid())
+  name   String
+  active Boolean @default(true)
+
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  schedules    Schedule[]
+  availabilityOverrides AvailabilityOverride[]
+  appointments Appointment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([businessId])
+}
+
+model Schedule {
+  id        String @id @default(uuid())
+  dayOfWeek Int
+  startTime String
+  endTime   String
+
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([employeeId])
+}
+model AvailabilityOverride {
+  id        String   @id @default(uuid())
+  date      DateTime
+  startTime String?
+  endTime   String?
+  type      AvailabilityOverrideType
+
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([employeeId])
+  @@index([date])
+}
+
+enum AvailabilityOverrideType {
+  AVAILABLE
+  UNAVAILABLE
+}
+
+model Appointment {
+  id          String            @id @default(uuid())
+  bookingCode String            @unique
+  status      AppointmentStatus @default(PENDING_PAYMENT)
+
+  customerName  String
+  customerPhone String
+  customerEmail String?
+
+  startAt DateTime
+  endAt   DateTime
+
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  serviceId String
+  service   Service @relation(fields: [serviceId], references: [id])
+
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([businessId])
+  @@index([employeeId])
+  @@index([startAt])
+}
+
+enum AppointmentStatus {
+  PENDING_PAYMENT
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
