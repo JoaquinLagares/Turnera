@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: turnera-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: turnera
+      POSTGRES_PASSWORD: turnera_dev_password
+      POSTGRES_DB: turnera
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - turnera_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  turnera_postgres_data:

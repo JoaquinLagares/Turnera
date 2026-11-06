@@ -25,13 +25,13 @@ export async function getServicesByBusinessController(
   try {
     const { businessId } = req.params;
 
-    const services = await getServicesByBusiness(businessId);
-
-    if (!businessId){
+    if (typeof businessId !== "string" || !businessId){
         return res.status(400).json({
             error: "Business ID required",
         })
     }
+
+    const services = await getServicesByBusiness(businessId);
     
     res.status(200).json(services);
   } catch (error) {

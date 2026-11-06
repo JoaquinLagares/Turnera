@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import { env } from "./config/env.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import serviceRoutes from "./modules/service/service.routes.js";
 import businessRoutes from "./modules/business/business.routes.js";
@@ -16,7 +17,7 @@ app.use(helmet());
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: env.FRONTEND_URL,
     credentials: true,
   })
 );

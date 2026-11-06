@@ -27,7 +27,7 @@ export async function getAvailabilityOverridesByEmployeeController(
   try {
     const employeeId = req.params.employeeId;
 
-    if (!employeeId) {
+    if (typeof employeeId !== "string" || !employeeId) {
       return res.status(400).json({
         error: "Employee ID is required",
       });

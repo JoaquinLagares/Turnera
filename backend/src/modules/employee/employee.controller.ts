@@ -26,7 +26,7 @@ export async function getEmployeesByBusinessController(
   try {
     const businessId = req.params.businessId;
 
-    if (!businessId) {
+    if (typeof businessId !== "string" || !businessId) {
       return res.status(400).json({
         error: "Business ID is required",
       });
